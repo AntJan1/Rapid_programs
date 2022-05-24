@@ -1,0 +1,28 @@
+# !/bin/bash
+#  rm -r results # debug
+if [[ -d "results" ]]
+then
+start=$(ls results/ | sort -g -r | head -1)+2
+else
+mkdir results
+nvcc finalcud.cu -o macierz -lm #-maxrregcount=64
+echo Compiling...
+start=5
+fi
+if [[ -n ${2} ]]; then
+start=${2}
+if((${2}==0));then
+start=${1}
+fi
+fi
+for ((i=start;i<=${1};i+=2))
+do
+echo robie $i
+./macierz $i
+if [[ -s eigenvalues.txt ]]
+then
+sort -V eigenvalues.txt | uniq -c > results/$i
+fi
+done
+rm eigenvalues.txt
+exit
